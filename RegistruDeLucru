@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace LoginRegistration
+{
+    public partial class RegistruDeLucru : Form
+    {
+        SqlConnection con = new SqlConnection("Data Source=LAPTOP-6777SITF\\CLSSQL;Initial Catalog=LoginDatabase;Integrated Security=True");
+        public RegistruDeLucru()
+        {
+            InitializeComponent();
+        }
+
+        private void LogoutButton_Click(object sender, EventArgs e)
+        {
+            Program.LogOff = true;
+            Close();
+            Login login = new Login();
+            login.ShowDialog();
+        }
+
+        private void CloseButton_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void CursuriComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void RegistruDeLucru_Load(object sender, EventArgs e)
+        {
+            
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Select * From CursTbl", con);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            cmd.ExecuteNonQuery();
+            con.Close();
+            
+            CursuriComboBox.DataSource = ds.Tables[0];
+            CursuriComboBox.DisplayMember = "NumeCurs";
+            CursuriComboBox.ValueMember = "Curs_ID";
+
+            CursuriComboBox.SelectedItem = null;
+            CursuriComboBox.SelectedText = "--select--";
+        }
+        int CPret=0;
+        int suma = 0;
+        private void SelectButton_Click(object sender, EventArgs e)
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Select * From CursTbl Where NumeCurs ='" + CursuriComboBox.Text + "'");
+            cmd.Connection = con;
+            cmd.ExecuteNonQuery();
+            SqlDataReader dr = cmd.ExecuteReader();
+            
+            if (dr.HasRows)
+            {
+                while (dr.Read())
+                {
+                    //textBox2.Text = dr[2].ToString();
+                    CPret = Convert.ToInt32(dr[2].ToString());
+                    suma = CPret + PStudent;
+                    textBox2.Text = suma.ToString();
+                }
+            }
+            con.Close();
+        }
+        int PStudent=0;
+        private void StudentTextBox_TextChanged(object sender, EventArgs e)
+        {
+            
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Select * From StudentTbl Where Nume ='" + StudentTextBox.Text + "'");
+            cmd.Connection = con;
+            cmd.ExecuteNonQuery();
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.HasRows)
+            {
+                while (dr.Read())
+                {
+                    //StudentTextBox.Text = dr[2].ToString();
+                    PStudent = Convert.ToInt32(dr[3].ToString());
+                }
+            }
+            con.Close();
+
+        }
+
+        private void PlatesteButton_Click(object sender, EventArgs e)
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("");
+        }
+    }
+}
