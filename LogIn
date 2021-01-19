@@ -1,0 +1,141 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+namespace LoginRegistration
+{
+    public partial class Login : Form
+    {
+        public Login()
+        {
+            InitializeComponent();
+        }
+
+        private void Login_Load(object sender, EventArgs e)
+        {
+            usernameTextBox.Select();
+            passwordTextBox.UseSystemPasswordChar = true;
+        }
+
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void CreateAccountLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Registration register = new Registration();
+            register.ShowDialog();
+        }
+
+        private void ShowPasswordCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            bool x = ShowPasswordCheckBox.Checked;
+            if(x == false)
+            { 
+                passwordTextBox.UseSystemPasswordChar = true;
+                
+            }
+            else
+            {
+                passwordTextBox.UseSystemPasswordChar = false;
+            }
+        }
+
+        private void loginButton_Click(object sender, EventArgs e)
+        {
+            if(!string.IsNullOrEmpty(usernameTextBox.Text)&&
+               !string.IsNullOrEmpty(passwordTextBox.Text))
+            {
+
+
+                SqlConnection con = new SqlConnection("Data Source=LAPTOP-6777SITF\\CLSSQL;Initial Catalog=LoginDatabase;Integrated Security=True");
+                //SqlConnection con = new SqlConnection();
+                con.Open();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM LoginTbl WHERE Username = '" + usernameTextBox.Text + "' AND Password = '" + passwordTextBox.Text + "'", con);
+
+                //Daca aveam mai multe campuri in tabelul nostru din baza de date:
+                //SqlCommand cmd = new SqlCommand("insert into testfirst(name) values('"+textBox1.Text+"')",'"+textBox2.Text+"')",
+                //'"+textBox3.Text+"')",con);
+                cmd.Parameters.Add(usernameTextBox.Text, SqlDbType.VarChar).Value = usernameTextBox.Text;
+                cmd.Parameters.Add(passwordTextBox.Text, SqlDbType.VarChar).Value = passwordTextBox.Text;
+                DataTable table = new DataTable();
+                SqlDataAdapter adapter = new SqlDataAdapter();
+                adapter.SelectCommand = cmd;
+                adapter.Fill(table);
+
+                //int i = cmd.ExecuteNonQuery();
+                if (table.Rows.Count >0 )
+                {
+                    
+                    usernameTextBox.Clear();
+                    passwordTextBox.Clear();
+                    ShowPasswordCheckBox.Checked = false;
+
+                    MainForm formMain = new MainForm();
+                    formMain.ShowDialog();
+                    formMain = null;
+
+                    this.Show();
+                    this.usernameTextBox.Select();
+                    RegistruDeLucru registru = new RegistruDeLucru();
+                    registru.ShowDialog();
+                    Program.LogOff = false;
+                    this.Close();
+                    
+                }
+                else
+                {
+
+                    MessageBox.Show("The username or password is incorrect. Try again.", "Login",
+                    MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    usernameTextBox.Focus();
+                    usernameTextBox.SelectAll();
+                }
+
+                /*
+                string mySQl = string.Empty;
+                mySQl += "SELECT * FROM LoginTbl";
+                mySQl += "WHERE Username = '" + usernameTextBox.Text + "'";
+                mySQl += "AND Password = '" + passwordTextBox.Text + "'";
+
+                DataTable userData = new DataTable();
+                userData = ServerConnection.executeSQL(mySQl);
+
+                if(userData.Rows.Count > 0)
+                {
+                    usernameTextBox.Clear();
+                    passwordTextBox.Clear();
+                    ShowPasswordCheckBox.Checked = false;
+
+                    MainForm formMain = new MainForm();
+                    formMain.ShowDialog();
+                    formMain = null;
+
+                    this.Show();
+                    this.usernameTextBox.Select();
+
+                }
+                else
+                {
+
+                    MessageBox.Show("The username or password is incorrect. Try again.","Login",
+                        MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    usernameTextBox.Focus();
+                    usernameTextBox.SelectAll();
+                }*/
+            }
+        }
+
+        private void LogOutButton_Click(object sender, EventArgs e)
+        {
+            Program.LogOff = true;
+        }
+    }
+}
