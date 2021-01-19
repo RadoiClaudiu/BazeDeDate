@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+
+namespace Csharp_Login_And_Register
+{
+    /*
+         * we need to download the mysql connector
+         * add the connector to our project
+         * ( watch the video to see how ) 
+         * create a connection now with mysql
+         * open xampp and start mysql & apache
+         * go to phpmyadmin and create the users database
+         */
+
+    class DB
+    {
+        // the connection
+        private SqlConnection connection = new SqlConnection("Data Source=LAPTOP-6777SITF\\CLSSQL;Initial Catalog=LoginDatabase;Integrated Security=True");
+
+
+        // create a function to open the connection
+        public void openConnection()
+        {
+            if (connection.State == System.Data.ConnectionState.Closed)
+            {
+                connection.Open();
+            }
+        }
+
+        // create a function to close the connection
+        public void closeConnection()
+        {
+            if (connection.State == System.Data.ConnectionState.Open)
+            {
+                connection.Close();
+            }
+        }
+
+        // create a function to return the connection
+        public SqlConnection getConnection()
+        {
+            return connection;
+        }
+    }
+}
